@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define m 3 // Matrix dimensions
+#define m 3 // Board dimensions
 
 // Functions declaration
 void startGame();
-void printBoard(char grid[m][m]);
-bool checkWinner(char grid[m][m]);
+void printBoard(char board[m][m]);
+bool checkWinner(char board[m][m]);
 
-int main(void)
-{
+int main(void) {
     printf("****************************************************\n");
     printf("                     Tic Tac Toe                    \n");
     printf("****************************************************\n");
@@ -19,32 +18,46 @@ int main(void)
 }
 
 // Setup of game board
-void printBoard(char grid[m][m]) {
+void printBoard(char board[m][m]) {
     printf("\n");
     for (int i = 0; i < m; i++){
         for (int j = 0; j < m; j++){
             if (j == 2) {
-                printf(" %c\n", grid[i][j]);
+                printf(" %c\n", board[i][j]);
                 if (i != 2) printf(" ---------\n");
             }
-             else printf(" %c |", grid[i][j]);
+             else printf(" %c |", board[i][j]);
         }
     }
     printf("\n****************************************************\n");
 }
 
-
-void startGame()
-{
-    char matrix[m][m] = {{'1', '2', '3'}, {'4', '5', '6'}, {'7', '8', '9'}};
+// Start game
+void startGame() {
+    char board[m][m] = {{'1', '2', '3'}, {'4', '5', '6'}, {'7', '8', '9'}};
     int playerMove;
     char sign;
-
     int switchPlayer = 0;
 
     while (true){
         // Print game board
-        printBoard(matrix);
+        printBoard(board);
+
+        // Check the winning player 
+        if ((checkWinner(board) == true) && ((switchPlayer - 1) % 2 == 0)) {
+            printf("Player 1 Win!\n");
+            break;
+        }
+        else if ((checkWinner(board) == true) && ((switchPlayer - 1) % 2 != 0)){
+            printf("Player 2 Win!\n");
+            break;
+        }
+
+        // Check if the counter is greater than maximum number of plays
+        if (switchPlayer > 8) {
+            printf("It's a draw. No winner!\n");
+            break;
+        }
 
         while (true) {
             // Switch the player shift
@@ -64,53 +77,34 @@ void startGame()
             }
             int x = (playerMove - 1) / m; // Calculate row
             int y = (playerMove - 1) % m; // Calculate column
-            if ((matrix[x][y] == 'X') || (matrix[x][y] == 'O')) printf("Choose another box!\n");
+            if ((board[x][y] == 'X') || (board[x][y] == 'O')) printf("Choose another box!\n");
             else {
-                matrix[x][y] = sign;
+                board[x][y] = sign;
                 break;
             }
         }
-
-        bool c = checkWinner(matrix); // Check game combinations to verify the win
-        // Check the winning player 
-        if ((c == true) && (switchPlayer % 2 == 0)) {
-            printf("Player 1 Win!\n");
-            break;
-        }
-        else if ((c == true) && (switchPlayer % 2 != 0)) {
-            printf("Player 2 Win!\n");
-            break;
-        }
-
         switchPlayer++;
-        // Check if the counter is greater than maximum number of plays
-        if (switchPlayer > 8) {
-            printf("It's a draw. No winner!\n");
-            break;
-        }
     }
 }
 
 // Cheack combinations
-bool checkWinner(char grid[m][m]) {
-
+bool checkWinner(char board[m][m]) {
     // Horizontal combinations
     for(int i = 0; i < m; i++){
-        if(grid[i][0] == grid[i][1] && grid[i][0] == grid[i][2]){
+        if(board[i][0] == board[i][1] && board[i][0] == board[i][2]){
             return true;
         }
     }
 
     // Vertical combinations
     for(int i = 0; i < m; i++){
-        if(grid[0][i] == grid[1][i] && grid[0][i] == grid[2][i]){
+        if(board[0][i] == board[1][i] && board[0][i] == board[2][i]){
             return true;
         }
     }
 
     // Diagonal combinations
-    if (grid[0][0] == grid[1][1] && grid[0][0] == grid[2][2]) return true;
-    else if (grid[0][2] == grid[1][1] && grid[0][2] == grid[2][0]) return true;
+    if (board[0][0] == board[1][1] && board[0][0] == board[2][2]) return true;
+    else if (board[0][2] == board[1][1] && board[0][2] == board[2][0]) return true;
     else return false;
-
 }
