@@ -5,91 +5,94 @@
 #define m 3 // Matrix dimensions
 
 // Functions declaration
-void game();
-bool checkGame(char grid[m][m]);
+void startGame();
+void printBoard(char grid[m][m]);
+bool checkWinner(char grid[m][m]);
 
 int main(void)
 {
     printf("****************************************************\n");
     printf("                     Tic Tac Toe                    \n");
-    printf("****************************************************\n\n");
-    game();
+    printf("****************************************************\n");
+    startGame();
     return 0;
 }
 
-// Game function
-void game()
+// Setup of game board
+void printBoard(char grid[m][m]) {
+    printf("\n");
+    for (int i = 0; i < m; i++){
+        for (int j = 0; j < m; j++){
+            if (j == 2) {
+                printf(" %c\n", grid[i][j]);
+                if (i != 2) printf(" ---------\n");
+            }
+             else printf(" %c |", grid[i][j]);
+        }
+    }
+    printf("\n****************************************************\n");
+}
+
+
+void startGame()
 {
     char matrix[m][m] = {{'1', '2', '3'}, {'4', '5', '6'}, {'7', '8', '9'}};
-    int playerMove, switchPlayer;
+    int playerMove;
     char sign;
+
+    int switchPlayer = 0;
 
     while (true){
         // Print game board
-        for (int i = 0; i < m; i++){
-            for (int j = 0; j < m; j++){
-                if (j == 2) {
-                    printf(" %c\n", matrix[i][j]);
-                    if (i != 2) printf(" ---------\n");
-                }
-                else printf(" %c |", matrix[i][j]);
+        printBoard(matrix);
+
+        while (true) {
+            // Switch the player shift
+            if (switchPlayer % 2 == 0) {
+                printf("\nPlayer 1 (X): ");
+                sign = 'X';
+            }
+            else {
+                printf("\nPlayer 2 (O): ");
+                sign = 'O';
+            }
+            // Check the input if it is a int type and is between 1 and 9
+            if (scanf("%d", &playerMove) != 1 || playerMove < 1 || playerMove > 9) {
+                printf("Invalid input. Enter a number between 1 and 9.\n");
+                while(getchar() != '\n'); // Clean buffer input
+                continue;
+            }
+            int x = (playerMove - 1) / m; // Calculate row
+            int y = (playerMove - 1) % m; // Calculate column
+            if ((matrix[x][y] == 'X') || (matrix[x][y] == 'O')) printf("Choose another box!\n");
+            else {
+                matrix[x][y] = sign;
+                break;
             }
         }
-        printf("\n****************************************************\n");
 
-        if (switchPlayer % 2 == 0) {
-            printf("\nPlayer 1 (X): ");
-            sign = 'X';
+        bool c = checkWinner(matrix); // Check game combinations to verify the win
+        // Check the winning player 
+        if ((c == true) && (switchPlayer % 2 == 0)) {
+            printf("Player 1 Win!\n");
+            break;
         }
-        else {
-            printf("\nPlayer 2 (O): ");
-            sign = 'O';
-        }
-        scanf("%d", &playerMove);
-        switch (playerMove) {
-            case 1:
-                matrix[0][0] = sign;
-                break;
-            case 2:
-                matrix[0][1] = sign;
-                break;
-            case 3:
-                matrix[0][2] = sign;
-                break;
-            case 4:
-                matrix[1][0] = sign;
-                break;
-            case 5:
-                matrix[1][1] = sign;
-                break;
-            case 6:
-                matrix[1][2] = sign;
-                break;
-            case 7:
-                matrix[2][0] = sign;
-                break;
-            case 8:
-                matrix[2][1] = sign;
-                break;
-            case 9:
-                matrix[2][2] = sign;
-                break;
-            default:
-                printf("Choice not valid!\n");
-        }        
-
-        bool c = checkGame(matrix);
-        if (c == true) {
-            printf("Win!");
+        else if ((c == true) && (switchPlayer % 2 != 0)) {
+            printf("Player 2 Win!\n");
             break;
         }
 
         switchPlayer++;
+        // Check if the counter is greater than maximum number of plays
+        if (switchPlayer > 8) {
+            printf("It's a draw. No winner!\n");
+            break;
+        }
     }
 }
 
 // Cheack combinations
-bool checkGame(char grid[m][m]) {
+bool checkWinner(char grid[m][m]) {
 
     // Horizontal combinations
     for(int i = 0; i < m; i++){
@@ -99,8 +102,8 @@ bool checkGame(char grid[m][m]) {
     }
 
     // Vertical combinations
-    for(int i = 0; i < 3; i++){
-        if(grid[0][i] == grid[1][i] && grid[0][1] == grid[2][i]){
+    for(int i = 0; i < m; i++){
+        if(grid[0][i] == grid[1][i] && grid[0][i] == grid[2][i]){
             return true;
         }
     }
